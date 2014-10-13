@@ -99,7 +99,9 @@ window.Meme = function(image, canvas, top, bottom) {
 		canvas.width = w;
 		canvas.height = h;
 	};
-	setCanvasDimensions(image.width, image.height);	
+	setCanvasDimensions(image.width, image.height);
+
+	var fontSize = (canvas.height / 11);
 
 	/*
 	Draw a centered meme string
@@ -109,12 +111,11 @@ window.Meme = function(image, canvas, top, bottom) {
 
 		// Variable setup
 		topOrBottom = topOrBottom || 'top';
-		var fontSize = (canvas.height / 8);
 		var x = canvas.width / 2;
 		if (typeof y === 'undefined') {
-			y = fontSize;
+			y = fontSize + 10;
 			if (topOrBottom === 'bottom')
-				y = canvas.height - 10;
+				y = canvas.height - fontSize * 0.75;
 		}
 
 		// Should we split it into multiple lines?
@@ -133,9 +134,9 @@ window.Meme = function(image, canvas, top, bottom) {
 				while (i --) {
 					var justThis = words.slice(0, i).join(' ');
 					if (context.measureText(justThis).width < (canvas.width * 1.0)) {
-						drawText(justThis, topOrBottom, y);
-						drawText(words.slice(i, wordsLength).join(' '), topOrBottom, y + fontSize);
-						return;
+						y = drawText(justThis, topOrBottom, y);
+						y = drawText(words.slice(i, wordsLength).join(' '), topOrBottom, y);
+						return y;
 					}
 				}
 			}
@@ -143,20 +144,35 @@ window.Meme = function(image, canvas, top, bottom) {
 				for (var i = 0; i < wordsLength; i ++) {
 					var justThis = words.slice(i, wordsLength).join(' ');
 					if (context.measureText(justThis).width < (canvas.width * 1.0)) {
-						drawText(justThis, topOrBottom, y);
-						drawText(words.slice(0, i).join(' '), topOrBottom, y - fontSize);
-						return;
+						y = drawText(justThis, topOrBottom, y);
+						y = drawText(words.slice(0, i).join(' '), topOrBottom, y);
+						return y;
 					}
 				}
 			}
-
 		}
 
 		// Draw!
 		context.fillText(text, x, y, canvas.width * .9);
 		context.strokeText(text, x, y, canvas.width * .9);
 
+		return y + (topOrBottom === 'top' ? fontSize : -fontSize);
 	};
+
+	var drawLines = function(text, topOrBottom) {
+		var lines = text.split('\n');
+		var y;
+		if (topOrBottom === 'top') {
+			for (var i = 0; i < lines.length; i++) {
+				y = drawText(lines[i], topOrBottom, y);
+			}
+		}
+		else {
+			for (var i = lines.length - 1; i >= 0; i--) {
+				y = drawText(lines[i], topOrBottom, y);
+			}
+		}
+	}
 
 	/*
 	Do everything else after image loads
@@ -174,13 +190,13 @@ window.Meme = function(image, canvas, top, bottom) {
 		context.fillStyle = 'white';
 		context.strokeStyle = 'black';
 		context.lineWidth = 2;
-		var fontSize = (canvas.height / 8);
+		//var fontSize = (canvas.height / 12);
 		context.font = fontSize + 'px Impact';
 		context.textAlign = 'center';
 
 		// Draw them!
-		drawText(top, 'top');
-		drawText(bottom, 'bottom');
+		drawLines(top, 'top');
+		drawLines(bottom, 'bottom');
 
 	};
 

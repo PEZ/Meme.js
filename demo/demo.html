@@ -15,6 +15,8 @@
 	#top-line, #bottom-line {
 		padding: .5em;
 		border: 1px solid #999;
+		width: 360px;
+		height: 50px;
 		font: inherit;
 	}
 
@@ -32,12 +34,14 @@
 	<script src="jquery.js"></script>
 	<script>
 
+	var image = 'example.jpg';
+
 	$.fn.ready(function() {
 
-		Meme('example.jpg', 'canvas');
+		Meme(image, 'canvas');
 
 		$('#top-line, #bottom-line').keyup(function() {
-			Meme('example.jpg', 'canvas', $('#top-line').val(), $('#bottom-line').val());
+			Meme(image, 'canvas', $('#top-line').val(), $('#bottom-line').val());
 		});
 
 	});
@@ -50,10 +54,9 @@
 
 	<h1>Meme.js demo</h1>
 
-	<input id="top-line" placeholder="top line">
-	<input id="bottom-line" placeholder="bottom line">
-
+	<textarea id="top-line"></textarea>
 	<canvas id="canvas"></canvas>
+	<textarea id="bottom-line"></textarea>
 
 </body>
 </html>
